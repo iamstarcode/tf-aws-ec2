@@ -30,19 +30,28 @@ resource "aws_security_group" "example_security_group" {
     cidr_blocks = ["0.0.0.0/0"] # Allow HTTP from any IP
   }
 
+  egress {
+    description = "Outbound rules"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_instance" "new_instance" {
   ami           = var.ami
   instance_type = var.instance_type
   user_data     = <<-EOF
-                #!/bin/bash
-                yum update -y
-                yum install -y httpd
-                echo "<html><body><h1>Hello from AWS EC2!</h1></br><p>created by starcode</p></body></html>" > /var/www/html/index.html
-                service httpd start
-                chkconfig httpd on
-              EOF
+    #!/bin/bash
+
+    yum update -y
+    yum install -y httpd
+
+    systemctl start httpd
+    systemctl enable httpd
+    echo "<h1>Hello, world! From EC2</h1>" > /var/www/html/index.html
+EOF
 
   tags = {
     Name = "ExampleInstance"
@@ -52,3 +61,10 @@ resource "aws_instance" "new_instance" {
   vpc_security_group_ids = [aws_security_group.example_security_group.id]
 
 }
+
+# Output the public IP address for easy access
+output "public_ip" {
+  value = aws_instance.new_instance.public_ip
+}
+
+
