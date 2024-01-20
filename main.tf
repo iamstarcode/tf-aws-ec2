@@ -42,19 +42,9 @@ resource "aws_security_group" "example_security_group" {
 resource "aws_instance" "new_instance" {
   ami           = var.ami
   instance_type = var.instance_type
-  user_data     = <<-EOF
-    #!/bin/bash
-
-    yum update -y
-    yum install -y httpd
-
-    systemctl start httpd
-    systemctl enable httpd
-    echo "<h1>Hello, world! From EC2</h1>" > /var/www/html/index.html
-EOF
 
   tags = {
-    Name = "ExampleInstance"
+    Name = "web1"
   }
 
   key_name               = "sample"

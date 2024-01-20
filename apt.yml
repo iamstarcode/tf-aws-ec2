@@ -1,0 +1,17 @@
+---
+- name: Install Apt packages
+  hosts: web
+  become: true
+  vars:
+    pkgs:
+      - git
+      - nginx
+  tasks:
+    - name: Update APT package cache
+      ansible.builtin.apt:
+        update_cache: true
+      become: true
+    - name: Install Git
+      ansible.builtin.apt:
+        name: '{{ pkgs }}'
+        state: present
