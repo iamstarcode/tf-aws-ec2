@@ -30,6 +30,13 @@ resource "aws_security_group" "example_security_group" {
     cidr_blocks = ["0.0.0.0/0"] # Allow HTTP from any IP
   }
 
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP from any IP
+  }
+
   egress {
     description = "Outbound rules"
     from_port   = 0

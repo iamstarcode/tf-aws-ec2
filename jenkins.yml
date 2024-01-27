@@ -1,0 +1,50 @@
+---
+- name: Install Java, JDK, and Jenkins
+  hosts: web
+  become: true
+  tasks:
+    - name: Install Java and JDK (for Debian)
+      ansible.builtin.apt:
+        name:
+          - openjdk-17-jre
+          - fontconfig
+        state: present
+
+    - name: Download Jenkins keyring
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: '700'
+
+    - name: Add Jenkins repository
+      ansible.builtin.apt_repository:
+        repo: deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/
+
+    - name: Update apt packages cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Jenkins
+      ansible.builtin.apt:
+        name: jenkins
+        state: present
+
+    - name: Start Jenkins service
+      ansible.builtin.service:
+        name: jenkins
+        state: started
+        enabled: true
+
+    - name: Allow incoming traffic on port 8080
+      community.general.ufw:
+        rule: allow
+        port: 8080
+
+    - name: Allow OpenSSH (SSH)
+      community.general.ufw:
+        rule: allow
+        port: OpenSSH
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled

@@ -4,23 +4,14 @@
   become: true
 
   tasks:
-    - name: Update apt package cache (for Debian/Ubuntu)
-      apt:
-        update_cache: true
-      when: ansible_os_family == 'Debian'
-
-    - name: Install Nginx
-      package:
-        name: nginx
-        state: present
-
     - name: Start Nginx service
-      service:
+      ansible.builtin.service:
         name: nginx
         state: started
         enabled: true
 
     - name: Copy HTML file to serve
-      copy:
+      ansible.builtin.copy:
+        mode: '700'
         src: index.html
         dest: /var/www/html/index.html
