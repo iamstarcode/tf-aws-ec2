@@ -19,11 +19,11 @@
           - fontconfig
         state: present
 
-    - name: Add Jenkins GPG key
-      ansible.builtin.apt_key:
+    - name: Download Jenkins APT key
+      ansible.builtin.get_url:
         url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
-        state: present
-      register: jenkins_key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: '644'
 
     - name: Add Jenkins apt repository
       ansible.builtin.apt_repository:
@@ -53,7 +53,7 @@
     - name: Allow OpenSSH (SSH)
       community.general.ufw:
         rule: allow
-        port: OpenSSH
+        port: 22
 
     - name: Enable UFW
       community.general.ufw:
