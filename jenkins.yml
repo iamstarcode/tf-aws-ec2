@@ -3,22 +3,32 @@
   hosts: web
   become: true
   tasks:
-    - name: Install Java and JDK (for Debian)
+    - name: Update package lists
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: true
+        autoclean: true
+
+    - name: Install Java and JDK
       ansible.builtin.apt:
         name:
           - openjdk-17-jre
           - fontconfig
         state: present
 
-    - name: Download Jenkins keyring
-      ansible.builtin.get_url:
-        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-        dest: /usr/share/keyrings/jenkins-keyring.asc
-        mode: '700'
+    - name: Add Jenkins GPG key
+      ansible.builtin.apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+        state: present
+      register: jenkins_key
 
-    - name: Add Jenkins repository
+    - name: Add Jenkins apt repository
       ansible.builtin.apt_repository:
-        repo: deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/
+        repo: deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/
+        state: present
 
     - name: Update apt packages cache
       ansible.builtin.apt:
